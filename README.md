@@ -2,6 +2,8 @@
 
 A battery-powered 5.79" 4-grey e-paper wall panel (Waveshare 792×272 + NodeMCU V3 / ESP8266). It pulls its picture and settings from a small .NET server over Wi-Fi.
 
+![WallInfoPanel desk case showing a sample dashboard (Fusion render)](docs/images/device-dashboard.png)
+
 | Folder | What |
 |--------|------|
 | [`WallISetup/`](WallISetup/) | ESP8266 firmware (C++, VS Code + PlatformIO). SETUP mode over USB, RUN mode with deep sleep |

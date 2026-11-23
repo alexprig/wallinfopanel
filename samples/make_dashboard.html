@@ -1,0 +1,229 @@
+<!doctype html>
+<!--
+  Sample dashboard for the 792x272 4-grey e-paper (all data is made up).
+  Drawn on a canvas, then every pixel is snapped to the panel's 4 greys (0, 85, 170, 255).
+  Make the PNG (from the repo root):
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --hide-scrollbars \
+      --force-device-scale-factor=1 --window-size=792,272 \
+      --screenshot="$PWD/samples/dashboard.png" "file://$PWD/samples/make_dashboard.html"
+-->
+<html>
+<head>
+<meta charset="utf-8">
+<title>WallInfoPanel dashboard sample</title>
+<style>html, body { margin: 0; background: #fff; } canvas { display: block; }</style>
+</head>
+<body>
+<canvas id="c" width="792" height="272"></canvas>
+<script>
+const K = '#000', D = '#555', L = '#aaa', W = '#fff';
+const FONT = '"Helvetica Neue", Helvetica, Arial, sans-serif';
+const c = document.getElementById('c');
+const g = c.getContext('2d');
+
+g.fillStyle = W; g.fillRect(0, 0, 792, 272);
+
+function text(s, x, y, size, { weight = 400, color = K, align = 'left', spacing = 0 } = {}) {
+  g.font = `${weight} ${size}px ${FONT}`;
+  g.fillStyle = color; g.textAlign = align; g.textBaseline = 'alphabetic';
+  if ('letterSpacing' in g) g.letterSpacing = `${spacing}px`;
+  g.fillText(s, x, y);
+  if ('letterSpacing' in g) g.letterSpacing = '0px';
+}
+function width(s, size, weight = 400) { g.font = `${weight} ${size}px ${FONT}`; return g.measureText(s).width; }
+function rect(x, y, w, h, color) { g.fillStyle = color; g.fillRect(x, y, w, h); }
+function rrect(x, y, w, h, r, color) { g.fillStyle = color; g.beginPath(); g.roundRect(x, y, w, h, r); g.fill(); }
+function line(x1, y1, x2, y2, color = K, lw = 1) {
+  g.strokeStyle = color; g.lineWidth = lw; g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
+}
+function circle(x, y, r, fill, stroke, lw = 1) {
+  g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2);
+  if (fill) { g.fillStyle = fill; g.fill(); }
+  if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw; g.stroke(); }
+}
+
+// ---------- icons (s = scale, 1.0 ≈ 64 px wide)
+function sun(x, y, s, core = W) {
+  g.strokeStyle = K; g.lineWidth = Math.max(1.5, 3 * s); g.lineCap = 'round';
+  for (let i = 0; i < 8; i++) {
+    const a = i * Math.PI / 4;
+    line(x + Math.cos(a) * 17 * s, y + Math.sin(a) * 17 * s, x + Math.cos(a) * 25 * s, y + Math.sin(a) * 25 * s, K, Math.max(1.5, 3 * s));
+  }
+  g.lineCap = 'butt';
+  circle(x, y, 12 * s, core, K, Math.max(1.5, 3 * s));
+}
+function cloud(x, y, s, fill = W) {
+  const parts = [[-14, 4, 11], [0, -6, 15], [15, 2, 12], [-4, 6, 12], [8, 8, 11]];
+  for (const [dx, dy, r] of parts) circle(x + dx * s, y + dy * s, (r + 3) * s, K);
+  rect(x - 14 * s, y + 4 * s, 29 * s, 18 * s, K);
+  for (const [dx, dy, r] of parts) circle(x + dx * s, y + dy * s, r * s, fill);
+  rect(x - 14 * s, y + 4 * s, 29 * s, 15 * s, fill);
+}
+function drops(x, y, s) {
+  for (const dx of [-10, 0, 10]) line(x + dx * s, y, x + (dx - 4) * s, y + 10 * s, K, Math.max(1.5, 3 * s));
+}
+function partly(x, y, s) { sun(x - 10 * s, y - 10 * s, s * 0.85); cloud(x + 6 * s, y + 6 * s, s * 0.9); }
+function rainy(x, y, s) { cloud(x, y - 4 * s, s, L); drops(x, y + 22 * s, s); }
+function cloudy(x, y, s) { cloud(x + 8 * s, y - 6 * s, s * 0.7, L); cloud(x - 2 * s, y + 4 * s, s); }
+
+function wifi(x, y) {
+  g.strokeStyle = W; g.lineWidth = 2;
+  for (const r of [4, 8, 12]) { g.beginPath(); g.arc(x, y, r, -Math.PI * 0.75, -Math.PI * 0.25); g.stroke(); }
+  circle(x, y, 1.5, W);
+}
+function battery(x, y, pct) {
+  g.strokeStyle = W; g.lineWidth = 1.5; g.strokeRect(x + 0.5, y + 0.5, 22, 11);
+  rect(x + 23, y + 3.5, 2.5, 5, W);
+  rect(x + 3, y + 3, 17 * pct / 100, 6, W);
+}
+
+// ---------- status bar
+rect(0, 0, 792, 22, K);
+circle(12, 11, 3.5, W);
+text('LIVING ROOM', 22, 15.5, 11, { weight: 700, color: W, spacing: 1.5 });
+text('Rain from 11:00 · take an umbrella', 396, 15.5, 11, { color: W, align: 'center' });
+text('Updated 07:40', 700, 15.5, 11, { color: W, align: 'right' });
+wifi(718, 17);
+battery(738, 5, 87);
+text('87%', 786, 15.5, 10, { color: W, align: 'right' });
+
+// ---------- column A: clock, date, daylight
+text('07:42', 14, 98, 76, { weight: 700, spacing: -2 });
+text('Monday', 16, 132, 22, { weight: 700 });
+text('23 November 2026', 16, 154, 15, { color: D });
+rrect(176, 117, 46, 18, 9, K);
+text('WK 48', 199, 130, 10, { weight: 700, color: W, align: 'center', spacing: 0.5 });
+
+// sunrise / sunset
+sun(24, 184, 0.42);
+text('07:41', 40, 189, 14, { weight: 700 });
+text('rise', 82, 189, 11, { color: D });
+sun(130, 184, 0.42, L);
+text('16:22', 146, 189, 14, { weight: 700 });
+text('set', 188, 189, 11, { color: D });
+
+// 24 h daylight bar with "now" marker
+const bx = 16, bw = 202, by = 204;
+rect(bx, by, bw, 10, L);
+const h2x = h => bx + bw * h / 24;
+rect(h2x(7 + 41 / 60), by, h2x(16 + 22 / 60) - h2x(7 + 41 / 60), 10, W);
+g.strokeStyle = K; g.lineWidth = 1; g.strokeRect(bx + 0.5, by + 0.5, bw - 1, 9);
+rect(h2x(7 + 42 / 60) - 1.5, by - 4, 3, 18, K);
+for (const h of [0, 6, 12, 18, 24]) text(String(h).padStart(2, '0'), h2x(h), by + 26, 9, { color: D, align: 'center' });
+text('8 h 41 min of daylight', 16, 258, 12, { weight: 700 });
+// moon phase
+circle(206, 253, 8, W, K, 1.5);
+g.fillStyle = K; g.beginPath(); g.arc(206, 253, 8, Math.PI / 2, Math.PI * 1.5); g.ellipse(206, 253, 3.5, 8, 0, Math.PI * 1.5, Math.PI / 2, true); g.fill();
+
+line(232.5, 32, 232.5, 264, L);
+
+// ---------- column B: weather now, 12 h chart, 4-day forecast
+partly(276, 66, 1.0);
+text('6°', 316, 92, 62, { weight: 700, spacing: -2 });
+text('Partly cloudy', 400, 52, 15, { weight: 700 });
+text('Feels like 3°', 400, 70, 12, { color: D });
+text('H 9°   L 2°', 400, 88, 12, { weight: 700 });
+const facts = [['WIND', '14 SW'], ['HUM', '78%'], ['hPa', '1016'], ['UV', '1']];
+facts.forEach(([k, v], i) => {
+  const x = 242 + i * 70;
+  text(k, x, 114, 9, { color: D, weight: 700, spacing: 0.5 });
+  text(v, x + width(k, 9, 700) + 4, 114, 12, { weight: 700 });
+});
+
+// chart
+const cx0 = 262, cx1 = 518, cy0 = 132, cy1 = 172;
+const hours = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+const temp = [3, 4, 5, 6, 7, 8, 9, 8, 7, 6, 5, 4];
+const rain = [10, 10, 20, 45, 65, 70, 55, 35, 20, 10, 10, 5];
+const step = (cx1 - cx0) / (hours.length - 1);
+const tx = i => cx0 + i * step;
+const ty = t => cy1 - (t - 2) / (10 - 2) * (cy1 - cy0);
+text('NEXT 12 H', 242, 130, 9, { weight: 700, color: D, spacing: 0.5 });
+for (let i = 0; i < hours.length; i++) {
+  const h = (cy1 - cy0) * rain[i] / 100;
+  rect(tx(i) - 7, cy1 - h, 14, h, L);
+}
+line(cx0 - 10, cy1 + 0.5, cx1 + 10, cy1 + 0.5, D);
+g.strokeStyle = K; g.lineWidth = 2.5; g.lineJoin = 'round'; g.beginPath();
+temp.forEach((t, i) => (i ? g.lineTo(tx(i), ty(t)) : g.moveTo(tx(i), ty(t))));
+g.stroke();
+temp.forEach((t, i) => circle(tx(i), ty(t), 3, i === 0 ? K : W, K, 1.5));
+for (const i of [0, 3, 6, 9, 11]) {
+  text(`${temp[i]}°`, tx(i), ty(temp[i]) - 7, 10, { weight: 700, align: 'center' });
+  text(String(hours[i]).padStart(2, '0'), tx(i), cy1 + 12, 9, { color: D, align: 'center' });
+}
+
+line(240, 190.5, 524, 190.5, L);
+
+// forecast
+const days = [['TUE', partly, '8°', '1°'], ['WED', rainy, '5°', '2°'], ['THU', cloudy, '4°', '-1°'], ['FRI', sun, '7°', '0°']];
+days.forEach(([d, icon, hi, lo], i) => {
+  const x = 240 + i * 71 + 35;
+  text(d, x, 206, 10, { weight: 700, align: 'center', spacing: 1 });
+  icon === sun ? sun(x, 227, 0.5) : icon(x, 226, 0.45);
+  text(hi, x - 3, 263, 14, { weight: 700, align: 'right' });
+  text(lo, x + 3, 263, 14, { color: D });
+});
+
+line(530.5, 32, 530.5, 264, L);
+
+// ---------- column C: agenda + home
+text('TODAY', 540, 42, 11, { weight: 700, spacing: 1.5 });
+text('6 events', 784, 42, 11, { color: D, align: 'right' });
+const events = [
+  ['08:30', 'Team stand-up', 'past'],
+  ['10:00', 'Dentist · Dr. Weber', 'next'],
+  ['12:30', 'Lunch with Anna', ''],
+  ['15:00', 'Call: home insurance', ''],
+  ['18:00', 'Pick up parcel', ''],
+  ['19:30', 'Football training', ''],
+];
+events.forEach(([t, title, state], i) => {
+  const y = 50 + i * 23;
+  if (state === 'next') {
+    rrect(536, y, 252, 21, 4, K);
+    text(t, 544, y + 15, 12, { weight: 700, color: W });
+    text(title, 588, y + 15, 13, { weight: 700, color: W });
+    text('in 2:18', 782, y + 15, 10, { color: W, align: 'right', weight: 700 });
+  } else {
+    const col = state === 'past' ? L : K;
+    text(t, 544, y + 15, 12, { weight: 700, color: state === 'past' ? L : D });
+    text(title, 588, y + 15, 13, { color: col });
+    if (state === 'past') line(588, y + 10.5, 588 + width(title, 13), y + 10.5, L, 1.5);
+  }
+  if (i < events.length - 1 && state !== 'next' && events[i + 1][2] !== 'next') line(544, y + 22.5, 784, y + 22.5, L);
+});
+
+line(538, 194.5, 786, 194.5, L);
+
+// home tiles
+const tiles = [
+  ['INDOOR', '21.4°', '45% RH'],
+  ['CO₂', '640', 'ppm · good'],
+  ['BINS', 'Paper', 'tomorrow'],
+];
+tiles.forEach(([k, v, sub], i) => {
+  const x = 540 + i * 84;
+  text(k, x, 210, 9, { weight: 700, color: D, spacing: 0.8 });
+  text(v, x, 236, 22, { weight: 700, spacing: -0.5 });
+  if (k === 'CO₂') {
+    rect(x, 243, 72, 6, L);
+    rect(x, 243, 72 * 0.32, 6, K);
+    text(sub, x, 264, 10, { color: D });
+  } else {
+    text(sub, x, 258, 11, { color: D });
+  }
+});
+
+// ---------- snap every pixel to the 4 panel greys
+const img = g.getImageData(0, 0, 792, 272);
+const p = img.data;
+for (let i = 0; i < p.length; i += 4) {
+  const y = 0.299 * p[i] + 0.587 * p[i + 1] + 0.114 * p[i + 2];
+  const v = Math.round(y / 85) * 85;
+  p[i] = p[i + 1] = p[i + 2] = v; p[i + 3] = 255;
+}
+g.putImageData(img, 0, 0);
+</script>
+</body>
+</html>
