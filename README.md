@@ -10,6 +10,8 @@ A battery-powered 5.79" 4-grey e-paper wall panel (Waveshare 792×272 + NodeMCU 
 | [`docs/firmware-design.md`](docs/firmware-design.md) | Modes, setup switch, LED codes, memory plan |
 | [`docs/hardware-spec.md`](docs/hardware-spec.md) | Components, feasibility, energy budget, battery choice, wiring |
 | [`hw/`](hw/) | Photos of the hardware |
+| [`3d-modeling/`](3d-modeling/) | 3D-printed desk case: Fusion model, print-ready STLs, print and assembly guide |
+| [`samples/`](samples/) | Sample picture for the panel and the script that generates it |
 
 Quick start:
 

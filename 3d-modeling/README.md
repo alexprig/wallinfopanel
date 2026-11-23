@@ -1,6 +1,6 @@
 # WallInfoPanel desk case
 
-A 3D-printed wedge that stands under the monitor and shows the 5.79" e-paper at **30° back from vertical**. USB-C powered, no battery. Design: [docs/.superpowers/specs/2026-11-23-desk-case-design.md](../docs/.superpowers/specs/2026-11-23-desk-case-design.md).
+A 3D-printed wedge that stands under the monitor and shows the 5.79" e-paper at **30° back from vertical**. USB-C powered, no battery.
 
 Size: **169.4 × 61.0 × 70.2 mm**, rounded edges (4 mm outside, 2 mm inside) (W × D × H).
 
