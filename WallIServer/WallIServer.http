@@ -1,0 +1,99 @@
+@host = http://localhost:5080
+@apiKey = dev-admin-key-change-me
+@device = livingroom
+# Paste the token from the create response here:
+@token = paste-token-here
+
+### Setup page
+GET {{host}}/setup/
+
+### OpenAPI document (Development only)
+GET {{host}}/openapi/v1.json
+
+### List devices
+GET {{host}}/api/devices
+X-Api-Key: {{apiKey}}
+
+### Create a device (the token is returned only once)
+POST {{host}}/api/devices
+X-Api-Key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "id": "{{device}}",
+  "name": "Living room",
+  "intervalSeconds": 900,
+  "nightStart": "23:00",
+  "nightEnd": "06:00",
+  "timeZone": "Europe/Berlin",
+  "lowBattMv": 3300
+}
+
+### Get one device
+GET {{host}}/api/devices/{{device}}
+X-Api-Key: {{apiKey}}
+
+### Update settings (partial; "" clears nightStart/nightEnd/pendingUrl)
+PUT {{host}}/api/devices/{{device}}
+X-Api-Key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "intervalSeconds": 1800,
+  "pendingUrl": ""
+}
+
+### Rotate the token
+POST {{host}}/api/devices/{{device}}/token
+X-Api-Key: {{apiKey}}
+
+### Upload an image (contain + dither)
+POST {{host}}/api/devices/{{device}}/image?fit=contain&dither=true
+X-Api-Key: {{apiKey}}
+Content-Type: multipart/form-data; boundary=WallBoundary
+
+--WallBoundary
+Content-Disposition: form-data; name="file"; filename="photo.png"
+Content-Type: image/png
+
+< ./photo.png
+--WallBoundary--
+
+### Paste an image unscaled at x,y onto the current image
+POST {{host}}/api/devices/{{device}}/image?x=700&y=20
+X-Api-Key: {{apiKey}}
+Content-Type: multipart/form-data; boundary=WallBoundary
+
+--WallBoundary
+Content-Disposition: form-data; name="file"; filename="badge.png"
+Content-Type: image/png
+
+< ./badge.png
+--WallBoundary--
+
+### PNG preview of the current image
+GET {{host}}/api/devices/{{device}}/image.png
+X-Api-Key: {{apiKey}}
+
+### Device update call (what the panel sends)
+GET {{host}}/api/panel/{{device}}
+Authorization: Bearer {{token}}
+X-Fw: 0.1.0
+X-Batt-mV: 3950
+X-Rssi: -58
+X-Boot: init
+User-Agent: WallISetup/0.1.0
+
+### Device update call with the ETag it has (304 or region)
+GET {{host}}/api/panel/{{device}}
+Authorization: Bearer {{token}}
+If-None-Match: "0000000000000000"
+X-Fw: 0.1.0
+X-Batt-mV: 3950
+X-Rssi: -58
+X-Boot: timer
+User-Agent: WallISetup/0.1.0
+
+### Delete the device
+DELETE {{host}}/api/devices/{{device}}
+X-Api-Key: {{apiKey}}

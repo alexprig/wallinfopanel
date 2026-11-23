@@ -1,0 +1,10 @@
+{
+  "name": "wallcore",
+  "version": "0.1.0",
+  "description": "Hardware-independent logic of WallISetup (config, protocol, gray2 geometry). Unit-tested on the host.",
+  "frameworks": "*",
+  "platforms": "*",
+  "dependencies": {
+    "bblanchon/ArduinoJson": "^7.4.3"
+  }
+}

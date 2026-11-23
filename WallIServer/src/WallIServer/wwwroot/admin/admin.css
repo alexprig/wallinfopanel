@@ -1,0 +1,74 @@
+/* Admin page — builds on ../setup/setup.css (tokens, topbar, cards, fields, buttons, dialogs). */
+
+.small { font-size: 12px; }
+.admin { padding: 16px 24px 8px; display: grid; gap: 16px; }
+.gate { max-width: 460px; margin: 24px auto; }
+.gate h2 { margin: 0 0 6px; font-size: 18px; }
+.empty { text-align: center; color: var(--muted); }
+
+.devices { display: grid; gap: 16px; }
+
+/* Device card */
+.device { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 16px; }
+@media (max-width: 1100px) { .device { grid-template-columns: 1fr; } }
+.device-head { grid-column: 1 / -1; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.device-head h2 { margin: 0; font-size: 18px; }
+.device-head h2 .id { font-family: var(--mono); font-size: 13px; color: var(--muted); font-weight: 400; margin-left: 6px; }
+.device-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin: 0; }
+.stat { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; min-width: 0; }
+.stat dt { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.stat dd { margin: 2px 0 0; font-size: 14px; font-weight: 600; overflow-wrap: anywhere; }
+.stat.stale dd { color: var(--danger); }
+.stat.bad dd { color: var(--danger); }
+.stat.good dd { color: var(--ok); }
+
+.picture { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.picture-frame {
+  position: relative; aspect-ratio: 792 / 272; width: 100%; border-radius: 8px; overflow: hidden;
+  border: 1px solid var(--border); background: repeating-conic-gradient(var(--bg) 0 25%, var(--card) 0 50%) 0 0 / 16px 16px;
+  display: grid; place-items: center;
+}
+.picture-frame img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; display: block; }
+.picture-frame .placeholder { color: var(--muted); font-size: 13px; }
+.picture-frame.drop { outline: 3px dashed var(--accent); outline-offset: -3px; }
+.picture-meta { font-size: 12px; color: var(--muted); display: flex; gap: 12px; flex-wrap: wrap; }
+.picture-meta code { font-family: var(--mono); }
+.picture-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.card-msg { font-size: 13px; }
+.card-msg.ok { color: var(--ok); }
+.card-msg.error { color: var(--danger); }
+
+/* Settings form (per card and in the add dialog) */
+.settings { border-top: 1px solid var(--border); margin-top: 12px; padding-top: 12px; }
+.settings h3, dialog h3 { margin: 0 0 8px; font-size: 14px; }
+.settings-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 12px; }
+.settings-grid .span2 { grid-column: 1 / -1; }
+@media (max-width: 640px) { .settings-grid { grid-template-columns: 1fr; } }
+input[type=time] {
+  width: 100%; padding: 6px 10px; font: inherit; color: var(--text);
+  background: var(--input); border: 1px solid var(--border); border-radius: 7px;
+}
+.settings .actions, dialog .actions { display: flex; gap: 8px; justify-content: flex-end; align-items: center; margin-top: 8px; }
+.settings .actions .card-msg { margin-right: auto; }
+dialog.wide { max-width: 560px; width: calc(100% - 32px); }
+dialog p { margin: 0 0 12px; }
+.token-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin: 8px 0; }
+.token-box code { font-family: var(--mono); font-size: 14px; word-break: break-all; user-select: all; }
+#delete-input { width: 100%; padding: 7px 10px; font: inherit; color: var(--text); background: var(--input); border: 1px solid var(--border); border-radius: 7px; }
+
+/* Crop dialog */
+dialog.crop { max-width: 1240px; width: calc(100% - 32px); }
+.crop-panes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; } /* minmax: 792-px canvases must shrink */
+@media (max-width: 900px) { .crop-panes { grid-template-columns: minmax(0, 1fr); } }
+.crop-panes figure { margin: 0; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.crop-panes figcaption { font-size: 12px; color: var(--muted); }
+.crop-panes canvas { width: 100%; height: auto; aspect-ratio: 792 / 272; border: 1px solid var(--border); border-radius: 6px; background: #fff; display: block; }
+#crop-canvas { cursor: grab; touch-action: none; }
+#crop-canvas.dragging { cursor: grabbing; }
+#crop-canvas.fixed { cursor: default; }
+#crop-preview { image-rendering: pixelated; }
+.crop-controls { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+.crop-controls .zoom { display: flex; gap: 8px; align-items: center; font-weight: 600; font-size: 13px; flex: 1 1 240px; }
+.crop-controls .zoom input { flex: 1; }

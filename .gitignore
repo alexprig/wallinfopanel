@@ -1,0 +1,12 @@
+# macOS
+.DS_Store
+
+# Local tool state
+.remember/
+.claude/settings.local.json
+
+# PlatformIO build output (also ignored in WallISetup/.gitignore)
+.pio/
+
+# superpowers plan workspaces
+.superpowers/

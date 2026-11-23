@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>WallInfoPanel Setup</title>
+  <link rel="stylesheet" href="setup.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true"></span>
+      <div>
+        <h1>WallInfoPanel setup</h1>
+        <p class="sub">Configure the panel over USB (Web Serial, 115200 baud) · <a href="/admin/">Admin page</a></p>
+      </div>
+    </div>
+    <div class="conn">
+      <span id="conn-state" class="pill pill-off" role="status">Not connected</span>
+      <button id="btn-connect" class="btn btn-primary" type="button">Connect</button>
+    </div>
+  </header>
+
+  <div id="no-serial" class="banner banner-error" hidden>
+    <strong>Web Serial is not available in this browser.</strong>
+    Use Chrome or Edge on a desktop computer, and open this page via
+    <code>http://localhost:5080/setup/</code> or <code>https</code>.
+  </div>
+
+  <div id="status" class="status status-info" role="status" aria-live="polite">
+    Turn the panel's setup switch ON, press RST, plug in USB, then click <b>Connect</b> and pick the "USB-SERIAL CH340" port.
+  </div>
+
+  <main class="layout">
+    <section class="card" aria-labelledby="cfg-title">
+      <div class="card-head">
+        <h2 id="cfg-title">Configuration</h2>
+        <span id="dirty" class="tag" hidden>Unsaved changes</span>
+      </div>
+
+      <form id="cfg-form" novalidate autocomplete="off">
+        <fieldset>
+          <legend>Device</legend>
+          <div class="field">
+            <label for="f-name">Name</label>
+            <input id="f-name" name="name" type="text" maxlength="32" spellcheck="false">
+            <small class="hint">1–32 characters. Shown on the panel and used as its Wi-Fi hostname.</small>
+            <small class="err" data-for="name"></small>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Wi-Fi</legend>
+          <div class="field">
+            <label for="f-wifi-ssid">SSID <span class="req">required</span></label>
+            <div class="row">
+              <input id="f-wifi-ssid" name="wifi.ssid" type="text" maxlength="32" spellcheck="false">
+              <select id="ssid-list" aria-label="Scanned networks" disabled>
+                <option value="">Scan to list networks</option>
+              </select>
+            </div>
+            <small class="err" data-for="wifi.ssid"></small>
+          </div>
+          <div class="field">
+            <label for="f-wifi-pass">Password</label>
+            <div class="row">
+              <input id="f-wifi-pass" name="wifi.pass" type="password" maxlength="63" data-secret>
+              <button type="button" class="btn btn-ghost btn-small" data-toggle="f-wifi-pass">Show</button>
+            </div>
+            <small class="hint">Empty for an open network, otherwise 8–63 characters. Leave blank to keep the stored password.</small>
+            <small class="err" data-for="wifi.pass"></small>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Network <span class="muted">(leave all empty for DHCP)</span></legend>
+          <div class="grid2">
+            <div class="field">
+              <label for="f-net-ip">IP address</label>
+              <input id="f-net-ip" name="net.ip" type="text" inputmode="decimal" placeholder="DHCP" spellcheck="false">
+              <small class="err" data-for="net.ip"></small>
+            </div>
+            <div class="field">
+              <label for="f-net-gw">Gateway</label>
+              <input id="f-net-gw" name="net.gw" type="text" inputmode="decimal" placeholder="DHCP" spellcheck="false">
+              <small class="err" data-for="net.gw"></small>
+            </div>
+            <div class="field">
+              <label for="f-net-mask">Subnet mask</label>
+              <input id="f-net-mask" name="net.mask" type="text" inputmode="decimal" placeholder="DHCP" spellcheck="false">
+              <small class="err" data-for="net.mask"></small>
+            </div>
+            <div class="field">
+              <label for="f-net-dns">DNS <span class="muted">(optional)</span></label>
+              <input id="f-net-dns" name="net.dns" type="text" inputmode="decimal" placeholder="= gateway" spellcheck="false">
+              <small class="err" data-for="net.dns"></small>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Server</legend>
+          <div class="grid3 srv-grid">
+            <div class="field">
+              <label for="f-srv-address">Address <span class="req">required</span></label>
+              <input id="f-srv-address" name="srv.address" type="text" spellcheck="false" autocomplete="off"
+                     placeholder="server LAN IP, e.g. 192.168.1.10">
+              <small class="err" data-for="srv.address"></small>
+            </div>
+            <div class="field">
+              <label for="f-srv-port">Port</label>
+              <input id="f-srv-port" name="srv.port" type="number" min="1" max="65535" step="1" value="5080">
+              <small class="err" data-for="srv.port"></small>
+            </div>
+            <div class="field">
+              <label for="f-srv-device">Device ID <span class="req">required</span></label>
+              <input id="f-srv-device" name="srv.device" type="text" maxlength="32" spellcheck="false" autocomplete="off"
+                     placeholder="e.g. livingroom">
+              <small class="err" data-for="srv.device"></small>
+            </div>
+          </div>
+          <input id="f-url" name="url" type="hidden">
+          <p class="url-line">Update URL: <output id="url-preview" for="f-srv-address f-srv-port f-srv-device">—</output></p>
+          <small class="hint">Always plain <code>http://</code>. The panel can't reach <code>localhost</code>: use the server's LAN IP. The device ID must match a device on the <a href="/admin/">admin page</a>.</small>
+          <div id="url-warning" class="banner banner-warn" hidden>
+            The panel's saved URL doesn't match http://address:port/api/panel/id — saving will replace it.
+          </div>
+          <div class="field">
+            <label for="f-token">Token <span class="req">required</span></label>
+            <div class="row">
+              <input id="f-token" name="token" type="password" maxlength="64" spellcheck="false" data-secret>
+              <button type="button" class="btn btn-ghost btn-small" data-toggle="f-token">Show</button>
+            </div>
+            <small class="hint">1–64 characters, from <code>POST /api/devices</code> on the server. Leave blank to keep the stored token.</small>
+            <small class="err" data-for="token"></small>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Timing &amp; battery</legend>
+          <div class="grid3">
+            <div class="field">
+              <label for="f-interval">Interval (s)</label>
+              <input id="f-interval" name="interval" type="number" min="180" max="86400" step="1">
+              <small class="hint">180–86400. The server can override it.</small>
+              <small class="err" data-for="interval"></small>
+            </div>
+            <div class="field">
+              <label for="f-lowbatt">Low battery (mV)</label>
+              <input id="f-lowbatt" name="lowBatt_mV" type="number" min="2800" max="4200" step="1">
+              <small class="hint">2800–4200</small>
+              <small class="err" data-for="lowBatt_mV"></small>
+            </div>
+            <div class="field">
+              <label for="f-battscale">Battery scale (mV)</label>
+              <input id="f-battscale" name="battScale_mV" type="number" min="1000" max="15000" step="1">
+              <small class="hint">1000–15000: battery mV that reads as 1023 on A0.</small>
+              <small class="err" data-for="battScale_mV"></small>
+            </div>
+          </div>
+        </fieldset>
+
+        <div class="actions">
+          <button id="btn-read" type="button" class="btn" data-needs-conn>Read</button>
+          <button id="btn-save" type="submit" class="btn btn-primary" data-needs-conn>Save</button>
+        </div>
+      </form>
+    </section>
+
+    <div class="side">
+      <section class="card" aria-labelledby="info-title">
+        <div class="card-head">
+          <h2 id="info-title">Device</h2>
+        </div>
+        <dl id="info" class="info">
+          <dt>Firmware</dt><dd data-info="fw">–</dd>
+          <dt>Mode</dt><dd data-info="mode">–</dd>
+          <dt>MAC</dt><dd data-info="mac">–</dd>
+          <dt>Chip</dt><dd data-info="chip">–</dd>
+          <dt>Flash</dt><dd data-info="flash">–</dd>
+          <dt>Free heap</dt><dd data-info="heap">–</dd>
+          <dt>Battery</dt><dd data-info="batt_mV">–</dd>
+          <dt>Stored image</dt><dd data-info="hasImage">–</dd>
+          <dt>ETag</dt><dd data-info="etag" class="mono">–</dd>
+        </dl>
+      </section>
+
+      <section class="card" aria-labelledby="tools-title">
+        <div class="card-head">
+          <h2 id="tools-title">Tools</h2>
+        </div>
+        <div class="tools">
+          <button id="btn-scan" type="button" class="btn" data-needs-conn>Scan Wi-Fi</button>
+          <button id="btn-test-wifi" type="button" class="btn" data-needs-conn>Test Wi-Fi</button>
+          <button id="btn-test-update" type="button" class="btn" data-needs-conn>Test update</button>
+          <button id="btn-test-display" type="button" class="btn" data-needs-conn>Test display</button>
+          <button id="btn-reboot" type="button" class="btn" data-needs-conn>Reboot</button>
+          <button id="btn-reset" type="button" class="btn btn-danger" data-needs-conn>Factory reset</button>
+        </div>
+        <p class="hint">Tests use the settings <em>saved</em> on the device. Save first.</p>
+        <p class="hint">Done? Turn the setup switch OFF: the panel restarts, updates, then wakes every interval on its own.</p>
+        <div id="result" class="result" hidden></div>
+      </section>
+
+      <section class="card log-card" aria-labelledby="log-title">
+        <div class="card-head">
+          <h2 id="log-title">Serial log</h2>
+          <div class="row-tight">
+            <label class="check"><input id="log-noise" type="checkbox" checked> non-JSON</label>
+            <button id="btn-log-clear" type="button" class="btn btn-ghost btn-small">Clear</button>
+          </div>
+        </div>
+        <pre id="log" class="log" aria-live="off"></pre>
+      </section>
+    </div>
+  </main>
+
+  <dialog id="reset-dialog">
+    <form method="dialog">
+      <h3>Factory reset?</h3>
+      <p>This erases the configuration and the stored image on the panel. It can't be undone.</p>
+      <div class="actions">
+        <button value="cancel" class="btn" autofocus>Cancel</button>
+        <button value="confirm" class="btn btn-danger">Erase everything</button>
+      </div>
+    </form>
+  </dialog>
+
+  <footer class="foot">WallIServer · protocol v1 · the setup page needs no admin key</footer>
+
+  <script src="../js/walli-core.js"></script>
+  <script src="setup.js"></script>
+</body>
+</html>

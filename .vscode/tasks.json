@@ -1,0 +1,33 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build WallIServer",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["build", "${workspaceFolder}/WallIServer/src/WallIServer/WallIServer.csproj", "/property:GenerateFullPaths=true", "/consoleloggerparameters:NoSummary"],
+      "problemMatcher": "$msCompile",
+      "group": { "kind": "build", "isDefault": true }
+    },
+    {
+      "label": "build WallISetup (pio extension)",
+      "type": "process",
+      "command": "${userHome}/.platformio/penv/bin/pio",
+      "args": ["run", "--environment", "nodemcuv2"],
+      "options": { "cwd": "${workspaceFolder}/WallISetup" },
+      "problemMatcher": ["$platformio"],
+      "group": "build"
+    },
+    {
+      // Builds first (dependsOn), so compile errors stop it before anything is flashed.
+      "label": "flash WallISetup (pio extension)",
+      "type": "process",
+      "command": "${userHome}/.platformio/penv/bin/pio",
+      "args": ["run", "--environment", "nodemcuv2", "--target", "upload"],
+      "options": { "cwd": "${workspaceFolder}/WallISetup" },
+      "dependsOn": "build WallISetup (pio extension)",
+      "problemMatcher": ["$platformio"],
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    }
+  ]
+}

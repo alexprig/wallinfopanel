@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>WallInfoPanel Admin</title>
+  <link rel="stylesheet" href="../setup/setup.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true"></span>
+      <div>
+        <h1>WallInfoPanel admin</h1>
+        <p class="sub">Devices, pictures and status · <a href="/setup/">Setup page</a></p>
+      </div>
+    </div>
+    <div class="conn">
+      <span id="refresh-state" class="muted small"></span>
+      <button id="btn-add" class="btn btn-small btn-primary" type="button" disabled>+ Add device</button>
+      <button id="btn-refresh" class="btn btn-small" type="button" disabled>Refresh</button>
+      <button id="btn-lock" class="btn btn-small btn-ghost" type="button" disabled>Lock</button>
+    </div>
+  </header>
+
+  <div id="status" class="status" role="status" hidden></div>
+
+  <main class="admin">
+    <section id="key-gate" class="card gate" hidden>
+      <form id="key-form" autocomplete="off">
+        <h2>Admin key</h2>
+        <p class="hint">The <code>WallIServer:AdminApiKey</code> from the server's settings. It's kept only for this browser tab.</p>
+        <div class="row">
+          <input id="key-input" type="password" required spellcheck="false" placeholder="admin key" aria-label="Admin key">
+          <button class="btn btn-primary" type="submit">Unlock</button>
+        </div>
+        <small id="key-error" class="err"></small>
+      </form>
+    </section>
+
+    <section id="devices" class="devices" aria-live="polite" hidden></section>
+    <p id="empty" class="card empty" hidden>No devices yet — add one.</p>
+  </main>
+
+  <datalist id="tz-list"></datalist>
+
+  <dialog id="add-dialog" class="wide">
+    <form id="add-form" method="dialog" novalidate>
+      <h3>Add device</h3>
+      <div class="field">
+        <label for="add-id">Device ID <span class="req">required</span></label>
+        <input id="add-id" name="id" type="text" maxlength="32" spellcheck="false" autocomplete="off" placeholder="e.g. livingroom">
+        <small class="hint">Lowercase letters, digits and -, max 32. Enter the same ID on the setup page.</small>
+        <small class="err" data-for="id"></small>
+      </div>
+      <div class="settings-fields"></div>
+      <small class="err" data-for="_form"></small>
+      <div class="actions">
+        <!-- type=button: Enter in a field must submit with "Create", not with the first button -->
+        <button id="add-cancel" type="button" class="btn">Cancel</button>
+        <button id="add-submit" value="create" class="btn btn-primary">Create</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="token-dialog">
+    <form method="dialog">
+      <h3 id="token-title">Token</h3>
+      <p class="hint">Shown only once — enter it on the setup page.</p>
+      <div class="token-box"><code id="token-value"></code></div>
+      <small id="token-copied" class="hint"></small>
+      <div class="actions">
+        <button id="token-copy" type="button" class="btn">Copy</button>
+        <button value="close" class="btn btn-primary">Done</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="confirm-dialog">
+    <form method="dialog">
+      <h3 id="confirm-title"></h3>
+      <p id="confirm-text"></p>
+      <div class="actions">
+        <button value="cancel" class="btn">Cancel</button>
+        <button value="confirm" class="btn btn-primary" id="confirm-ok">OK</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="delete-dialog">
+    <form method="dialog">
+      <h3>Delete device?</h3>
+      <p>This removes <strong id="delete-id"></strong>, its token and all stored pictures. The panel stops getting updates. Type the device ID to confirm.</p>
+      <input id="delete-input" type="text" spellcheck="false" autocomplete="off" aria-label="Device ID to confirm">
+      <div class="actions">
+        <button value="cancel" class="btn">Cancel</button>
+        <button id="delete-ok" value="confirm" class="btn btn-danger" disabled>Delete</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="crop-dialog" class="crop">
+    <form id="crop-form" method="dialog">
+      <h3 id="crop-title">Picture</h3>
+      <p class="hint">Drag to move · scroll or use the slider to zoom · arrow keys nudge. The frame is the panel (792×272).</p>
+      <div class="crop-panes">
+        <figure>
+          <canvas id="crop-canvas" width="792" height="272" tabindex="0" aria-label="Crop frame: drag to move, scroll to zoom"></canvas>
+          <figcaption>Crop</figcaption>
+        </figure>
+        <figure>
+          <canvas id="crop-preview" width="792" height="272" aria-label="4-grey preview of the panel"></canvas>
+          <figcaption>On the panel (4 greys)</figcaption>
+        </figure>
+      </div>
+      <div class="crop-controls">
+        <label class="zoom">Zoom <input id="crop-zoom" type="range" min="0" max="1000" value="0" step="1"></label>
+        <label class="check"><input id="crop-fit" type="checkbox"> Fit whole image</label>
+        <label class="check"><input id="crop-dither" type="checkbox" checked> Dither</label>
+        <button id="crop-reset" type="button" class="btn btn-small btn-ghost">Reset</button>
+      </div>
+      <div class="actions">
+        <button id="crop-cancel" type="button" class="btn">Cancel</button>
+        <button id="crop-send" value="send" class="btn btn-primary">Send to server</button>
+      </div>
+    </form>
+  </dialog>
+
+  <footer class="foot">WallIServer admin · protocol v1</footer>
+
+  <script src="../js/walli-core.js"></script>
+  <script src="crop.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

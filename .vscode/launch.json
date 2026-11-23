@@ -1,0 +1,26 @@
+{
+  // Open this folder (WallIServer/) in VS Code with the C# Dev Kit extension, then press F5.
+  // launchSettings.json can't choose a browser (launchBrowser always uses the macOS default),
+  // so the browser is chosen here: serverReadyAction opens the setup page in Chrome once Kestrel
+  // prints "Now listening on". Always localhost: Web Serial needs a secure context.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "WallIServer (Development)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build WallIServer",
+      "program": "${workspaceFolder}/WallIServer/src/WallIServer/bin/Debug/net10.0/WallIServer.dll",
+      "cwd": "${workspaceFolder}/WallIServer/src/WallIServer",
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "console": "internalConsole",
+      "serverReadyAction": {
+        "action": "debugWithChrome",
+        "pattern": "Now listening on:\\s+https?://\\S+:([0-9]+)",
+        "uriFormat": "http://localhost:%s/setup/"
+      }
+    }
+  ]
+}
