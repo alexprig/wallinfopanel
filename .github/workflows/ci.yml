@@ -17,7 +17,7 @@ jobs:
         working-directory: WallIServer
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         with:
           global-json-file: WallIServer/global.json
       - uses: actions/setup-node@v5
