@@ -2,7 +2,9 @@
 
 A 3D-printed wedge that stands under the monitor and shows the 5.79" e-paper at **30° back from vertical**. USB-C powered, no battery.
 
-Size: **169.4 × 61.0 × 70.2 mm**, rounded edges (4 mm outside, 2 mm inside) (W × D × H).
+Size: **170.4 × 61.3 × 70.7 mm** (W × D × H), **2.5 mm walls**, rounded edges (4.5 mm outside, 2 mm inside).
+
+The screen window has the same 3-step bevel on all four sides: the opening is 0.5, 1.1 and 1.7 mm larger than the 139 × 47.74 mm image (inner to outer step).
 
 ## Files
 
@@ -25,7 +27,7 @@ PLA or PETG, 0.4 mm nozzle, 0.2 mm layers, **no supports**. The STLs are already
 |---|---|---|
 | `window_coupon.stl` | 1 | Print first (≈10 min): check the screen window |
 | `nodemcu_coupon.stl` | 1 | Print first (≈5 min): check the NodeMCU holes |
-| `body.stl` | 1 | Upside down, flat top on the bed. 3+ perimeters for the screw bosses |
+| `body.stl` | 1 | Upside down, flat top on the bed. 3+ perimeters for the insert bosses |
 | `bottom_plate.stl` | 1 | Inside face on the bed |
 | `clamp_tabs_x2.stl` | 1 | Two tabs (bottom edge) |
 | `button_caps_x2.stl` | 1 | RST and FLASH caps; collar on the bed. Small parts: print slowly, or with a brim |
@@ -38,12 +40,15 @@ PLA or PETG, 0.4 mm nozzle, 0.2 mm layers, **no supports**. The STLs are already
 
 ## Assemble
 
-Screws: 2 × M2.5 × 6 self-tapping (tabs), 4 × M3 × 12 countersunk + 4 nuts (NodeMCU, from outside), 2 × M2 × 6 + 2 nuts (USB-C), 4 × M3 × 6 countersunk (bottom plate), 4 rubber feet Ø10 mm.
+Screws: 2 × M2.5 × 6 self-tapping (tabs), 4 × M2.5 heat-set inserts (OD 3.5, L 4 mm) + 4 × M2.5 × 6 socket-head screws (NodeMCU), 2 × M2 × 6 + 2 nuts (USB-C), 4 × M3 × 6 countersunk (bottom plate), 4 rubber feet Ø10 mm.
 
-1. **Panel:** from inside, glass towards the window, flex cable on the right. Slide its **top edge under the three built-in hooks**, lay it flat against the window, and let it drop onto the small ribs at the bottom. Ribs on the left and near the right corners keep it from sliding sideways. Fix the bottom edge with the two clamp tabs (hole end away from the panel), M2.5 self-tapping into the bosses.
-2. **USB-C socket:** from inside, flange in its pocket in the back wall, 2 × M2 screws from outside with nuts inside. Wire G, V, D+, D− to the NodeMCU's USB lines.
-3. **Setup switch:** push the mini slide switch into the frame behind the slot, lever through the slot. A drop of hot glue holds it.
-4. **NodeMCU:** components facing the back wall, USB end towards the USB-C socket. Push the 4 × M3 × 12 countersunk screws in **from outside** through the back wall and the bosses, put the board on, and tighten the nuts on the pin side (fingers or pliers through the open bottom). Plug in the panel cable. Before the board goes on, push the two **button caps** in from inside: square shaft through the square holes, collar against the wall. The board's buttons then sit right behind them. From outside: **RST** is the cap just below the upper screw, **FLASH** the one just above the lower screw (hold FLASH, tap RST to force flashing mode).
-5. **Bottom plate:** 4 × M3 countersunk screws from below, then the rubber feet in their recesses.
+The NodeMCU goes in **before the panel**: its screws are driven from the inside, and the panel would block them.
+
+1. **Inserts:** melt the four M2.5 inserts into the bosses on the inside of the back wall (Ø3.2 × 5 mm holes) with a soldering iron, flush with the boss tops. The back wall stays closed on the outside.
+2. **Button caps and NodeMCU:** push the two **button caps** in from inside: square shaft through the square holes, collar against the wall. Then put the board on the bosses, components facing the back wall, USB end towards the USB-C socket, and fix it with 4 × M2.5 × 6 from the pin side. The upper two screws are reachable through the window opening; for the lower two, use a 2 mm L-key through the open bottom. The board's buttons sit right behind the caps. From outside: **RST** is the cap just below the upper screw, **FLASH** the one just above the lower screw (hold FLASH, tap RST to force flashing mode).
+3. **USB-C socket:** from inside, flange in its pocket in the back wall, 2 × M2 screws from outside with nuts inside. Wire G, V, D+, D− to the NodeMCU's USB lines.
+4. **Setup switch:** push the mini slide switch into the frame behind the slot, lever through the slot. A drop of hot glue holds it.
+5. **Panel:** from inside, glass towards the window, flex cable on the right. Slide its **top edge under the three built-in hooks**, lay it flat against the window, and let it drop onto the small ribs at the bottom. Ribs on the left and near the right corners keep it from sliding sideways. Fix the bottom edge with the two clamp tabs (hole end away from the panel), M2.5 self-tapping into the bosses. Plug in the panel cable.
+6. **Bottom plate:** 4 × M3 countersunk screws from below, then the rubber feet in their recesses.
 
 **Power note:** 4-pad USB-C boards often lack the two 5.1 kΩ CC resistors. Without them, a USB-C-to-C cable or charger gives no power; USB-A-to-C cables still work.
